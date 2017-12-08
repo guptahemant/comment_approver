@@ -1,0 +1,8 @@
+services:
+  plugin.manager.comment_approver:
+    class: Drupal\comment_approver\Plugin\CommentApproverManager
+    parent: default_plugin_manager
+  comment_approver.tester:
+    class: Drupal\comment_approver\CommentTester
+    arguments: ['@plugin.manager.comment_approver', '@config.factory']
+

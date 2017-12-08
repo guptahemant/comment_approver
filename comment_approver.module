@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @file
+ * Contains comment_approver.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function comment_approver_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the comment_approver module.
+    case 'help.page.comment_approver':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('A module to allow adminstrators to automatically approve comments') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function comment_approver_theme() {
+  return [
+    'comment_approver' => [
+      'render element' => 'children',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_Entity_type_presave().
+ */
+function comment_approver_comment_presave(Drupal\Core\Entity\EntityInterface $entity) {
+  // dsm($entity->get('status')->value);
+  if(!$entity->get('status')->value){
+    //test for automated approval of comment if skip comment approval is disabled
+    //and set the comment status to 1 if test passes.
+    $comment = $entity;
+    $commentTester = \Drupal::service('comment_approver.tester');
+    if($commentTester->test($comment)){
+      $entity->set('status',1);
+    }
+  }
+}
