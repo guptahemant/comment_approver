@@ -44,10 +44,24 @@ class CommentTester implements CommentTesterInterface {
    * @return array
    */
   public function getTests() {
+    return $this->getConfig('select_tests_to_perform');
+  }
+
+  /**
+   * Returns current mode of operation of CommentAprrover.
+   */
+  public function getMode() {
+    return $this->getConfig('mode');
+  }
+
+  /**
+   * Returns the selected config.
+   */
+  public function getConfig(string $configName) {
     if (!isset($this->config)) {
       $this->config = $this->configFactory->get('comment_approver.commentapproversettings');
     }
-    return $this->config->get('select_tests_to_perform');
+    return $this->config->get($configName);
   }
 
   /**

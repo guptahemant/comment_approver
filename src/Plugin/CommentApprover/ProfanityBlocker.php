@@ -19,7 +19,7 @@ class ProfanityBlocker extends CommentApproverBase {
    * {@inheritdoc}.
    */
   public function isCommentFine($comment) {
-    return TRUE;
+    return FALSE;
   }
 
 }

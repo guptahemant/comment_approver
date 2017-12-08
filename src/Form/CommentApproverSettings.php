@@ -7,6 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\comment_approver\Plugin\CommentApproverManager;
+use Drupal\comment_approver\CommentTesterInterface;
 
 /**
  * Class CommentApproverSettings.
@@ -74,12 +75,30 @@ class CommentApproverSettings extends ConfigFormBase {
     $form['select_tests_to_perform'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Select tests to perform'),
-      '#description' => $this->t('Select the tests which will be performed on a comment to publish them automatically'),
+      '#description' => $this->t('Select the tests which will be performed on a comment to publish/unpublish them automatically'),
       '#options' => $options,
       '#default_value' => $config->get('select_tests_to_perform') ? $config->get('select_tests_to_perform') : array_keys($options),
     ];
     $form['select_tests_to_perform'] += $options_description;
 
+    $options_mode = [
+      CommentTesterInterface::DEFAULT => $this->t('Bypass the comment approver'),
+      CommentTesterInterface::APPROVER => $this->t('Work as comment approver'),
+      CommentTesterInterface::BLOCKER => $this->t('Work as comment blocker'),
+    ];
+    $options_mode_description = [
+      CommentTesterInterface::DEFAULT => ['#description' => $this->t('Default drupal flow will be followed')],
+      CommentTesterInterface::APPROVER => ['#description' => $this->t('If all tests passes then the comment is approved')],
+      CommentTesterInterface::BLOCKER => ['#description' => $this->t('If any test fails then comment is blocked')],
+    ];
+    $form['mode'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Mode of operation'),
+      '#description' => $this->t('Select the mode in which this module works'),
+      '#options' => $options_mode,
+      '#default_value' => $config->get('mode') ? $config->get('mode') : CommentTesterInterface::APPROVER,
+    ];
+    $form['mode'] += $options_mode_description;
     return parent::buildForm($form, $form_state);
   }
 
@@ -98,6 +117,7 @@ class CommentApproverSettings extends ConfigFormBase {
 
     $this->config('comment_approver.commentapproversettings')
       ->set('select_tests_to_perform', $form_state->getValue('select_tests_to_perform'))
+      ->set('mode', $form_state->getValue('mode'))
       ->save();
   }
 

@@ -5,7 +5,9 @@
  * Contains comment_approver.module.
  */
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\comment_approver\CommentTesterInterface;
 
 /**
  * Implements hook_help().
@@ -37,15 +39,25 @@ function comment_approver_theme() {
 /**
  * Implements hook_Entity_type_presave().
  */
-function comment_approver_comment_presave(Drupal\Core\Entity\EntityInterface $entity) {
-  // dsm($entity->get('status')->value);
-  if(!$entity->get('status')->value){
-    //test for automated approval of comment if skip comment approval is disabled
-    //and set the comment status to 1 if test passes.
-    $comment = $entity;
-    $commentTester = \Drupal::service('comment_approver.tester');
-    if($commentTester->test($comment)){
-      $entity->set('status',1);
+function comment_approver_comment_presave(EntityInterface $entity) {
+  $comment = $entity;
+  $commentTester = \Drupal::service('comment_approver.tester');
+  $current_mode = $commentTester->getMode();
+  if (!$entity->get('status')->value) {
+    if ($current_mode == CommentTesterInterface::APPROVER) {
+
+      // Perform approval test
+      // Test for automated approval of comment if skip comment approval is disabled
+      // and set the comment status to 1 if test passes.
+      if ($commentTester->test($comment)) {
+        $entity->set('status', 1);
+      }
+    }
+  }
+  elseif (!Drupal::currentUser()->hasPermission('administer comments') && $current_mode == CommentTesterInterface::BLOCKER) {
+    // Perform blocker test.
+    if (!$commentTester->test($comment)) {
+      $entity->set('status', 0);
     }
   }
 }
