@@ -24,7 +24,7 @@ class CommentTester implements CommentTesterInterface {
    */
   protected $configFactory;
   /**
-   * Automatic label configuration.
+   * CommentTester configuration.
    *
    * @var \Drupal\Core\Config\ImmutableConfig
    */
@@ -52,6 +52,17 @@ class CommentTester implements CommentTesterInterface {
    */
   public function getMode() {
     return $this->getConfig('mode');
+  }
+
+  /**
+   * Returns a crested instance for a test.
+   */
+  public function getTestInstance($testname) {
+    $test_config = $this->getConfig($testname);
+    if(!$test_config){
+      $test_config = [];
+    }
+    return $this->pluginManagerCommentApprover->createInstance($testname,$test_config);
   }
 
   /**
@@ -90,7 +101,7 @@ class CommentTester implements CommentTesterInterface {
    * @return bool
    */
   public function runTest(string $testname, CommentInterface $comment) {
-    $test = $this->pluginManagerCommentApprover->createInstance($testname);
+    $test = $this->getTestInstance($testname);
     return $test->isCommentFine($comment);
   }
 

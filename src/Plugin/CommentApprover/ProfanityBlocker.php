@@ -19,7 +19,27 @@ class ProfanityBlocker extends CommentApproverBase {
    * {@inheritdoc}.
    */
   public function isCommentFine($comment) {
-    return FALSE;
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm() {
+    $config = $this->getConfiguration();
+    $myform['testWords'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Add a comma seperated list of words to test'),
+      '#default_value' => $config['testWords'],
+    );
+    return $myform;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultConfiguration() {
+    return ['testWords' => 'shit,hell'];
   }
 
 }
