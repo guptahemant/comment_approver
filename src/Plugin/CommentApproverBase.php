@@ -27,14 +27,7 @@ abstract class CommentApproverBase extends PluginBase implements CommentApprover
    * {@inheritdoc}
    */
   public function settingsForm() {
-     return false;
-    $config = $this->getConfiguration();
-    $myform['basePath'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Drupal Base Path of WeatherAPI'),
-      '#default_value' => $config['basePath'],
-    );
-    return $myform;
+    return FALSE;
   }
 
   /**
