@@ -1,0 +1,11 @@
+
+comment_approver.comment_approver_settings:
+  path: '/admin/config/comment_approver/commentapproversettings'
+  defaults:
+    _form: '\Drupal\comment_approver\Form\CommentApproverSettings'
+    _title: 'Comment Approver Settings'
+  requirements:
+    _permission: 'administer comment approver'
+  options:
+    _admin_route: TRUE
+
