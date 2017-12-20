@@ -1,0 +1,7 @@
+name: Comment approver
+type: module
+description: A module to allow adminstrators to automatically approve comments
+core: 8.x
+package: Comment approver
+dependencies:
+  - drupal:comment
