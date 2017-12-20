@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * Contains comment_approver.module.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\comment_approver\CommentTesterInterface;
+
+/**
+ * Implements hook_help().
+ */
+function comment_approver_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the comment_approver module.
+    case 'help.page.comment_approver':
+      $output = file_get_contents(drupal_get_path('module', 'comment_approver') . '/README.md');
+      return $output;
+
+    default:
+  }
+}
+
+
