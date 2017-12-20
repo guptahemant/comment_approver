@@ -24,6 +24,17 @@ function comment_approver_help($route_name, RouteMatchInterface $route_match) {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function comment_approver_theme() {
+  return [
+    'comment_approver' => [
+      'render element' => 'children',
+    ],
+  ];
+}
+
+/**
  * Implements hook_Entity_type_presave().
  */
 function comment_approver_comment_presave(EntityInterface $entity) {
