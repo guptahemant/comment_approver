@@ -68,8 +68,32 @@ class CommentApproverSettings extends ConfigFormBase {
     $options_description = [];
 
     foreach ($plugins as $plugin) {
-      $options[$plugin['id']] = $plugin['label'];
-      $options_description[$plugin['id']]['#description'] = $plugin['description'];
+      $plugin_id = $plugin['id'];
+
+      // Get the already saved plugin configuration.
+      $plugin_config = $config->get($plugin_id) ? $config->get($plugin_id) : [];
+
+      // Create a plugin instance.
+      $plugin_instance = $this->pluginManagerCommentApprover->createInstance($plugin_id, $plugin_config);
+
+      // Create options array.
+      $options[$plugin_id] = $plugin_instance->getLabel();
+      $options_description[$plugin_id]['#description'] = $plugin_instance->getDescription();
+
+      // Gets a plugin settings form.
+      $settings_form = $plugin_instance->settingsForm();
+
+      if ($settings_form) {
+        // If settings form is available embed it in the form.
+        $form[$plugin_id] = array(
+          '#type' => 'details',
+          '#title' => $plugin['label'],
+          '#tree' => TRUE,
+          '#parents' => [$plugin_id],
+          '#group' => 'test_settings',
+        );
+        $form[$plugin_id] += $settings_form;
+      }
     }
 
     $form['select_tests_to_perform'] = [
@@ -99,6 +123,12 @@ class CommentApproverSettings extends ConfigFormBase {
       '#default_value' => $config->get('mode') ? $config->get('mode') : CommentTesterInterface::APPROVER,
     ];
     $form['mode'] += $options_mode_description;
+
+    $form['test_settings'] = [
+      '#type' => 'vertical_tabs',
+      '#title' => t('Settings'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -115,8 +145,17 @@ class CommentApproverSettings extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    $this->config('comment_approver.commentapproversettings')
-      ->set('select_tests_to_perform', $form_state->getValue('select_tests_to_perform'))
+    $config = $this->config('comment_approver.commentapproversettings');
+    $select_tests_to_perform = $form_state->getValue('select_tests_to_perform');
+
+    // Save the configuration of each selected plugin.
+    foreach ($select_tests_to_perform as $testname => $value) {
+      if ($value) {
+        $config->set($testname, $form_state->getValue($testname));
+      }
+    }
+
+    $config->set('select_tests_to_perform', $select_tests_to_perform)
       ->set('mode', $form_state->getValue('mode'))
       ->save();
   }
