@@ -11,7 +11,7 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
 interface CommentApproverInterface extends ConfigurablePluginInterface,PluginInspectionInterface {
 
   /**
-   * Return the name of the ice cream flavor.
+   * Return the name of the plugin.
    *
    * @return string
    */
